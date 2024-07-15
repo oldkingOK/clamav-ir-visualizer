@@ -1,8 +1,10 @@
 from PyMermaid.mermaid import flowchart as f
 from load_ir import *
+from sys import argv
 
 f.set_layout(f.layout_topToBottom)
 template = open("template.html").read()
+
 def render(func, output):
     nodes = {}
     for id, block in func.blocks.items():
@@ -28,5 +30,6 @@ def render(func, output):
                                         .replace("\n```", "")))
 
 if __name__ == "__main__":
+    funcs = load_ir(argv[1] if len(argv) > 1 else "./sample/sample_ir.log")
     for i in range(len(funcs)):
         render(funcs[i], f"func{i}.html")

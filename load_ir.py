@@ -56,7 +56,6 @@ class Function:
         return f"Function {self.id}:\nGlobals: IGNORE\nLocals: {len(self.locals)}\nConstants: {len(self.constants)}"
 
 SEPERATOR = "------------------------------------------------------------------------"
-lines = open("./sample/sample_ir.log").readlines()
 
 # File readers 
 
@@ -143,23 +142,26 @@ class AsmReader(BlockReader):
         
         return blocks
 
+def load_ir(filename) -> list[Function]:
+    lines = open(filename).readlines()
+    # get blocks
+    blocks = []
+    tmp_block = []
+    for line in lines:
+        if SEPERATOR in line:
+            blocks.append(tmp_block)
+            tmp_block = []
+        else:
+            tmp_block.append(line[:-1])
 
-# get blocks
-blocks = []
-tmp_block = []
-for line in lines:
-    if SEPERATOR in line:
-        blocks.append(tmp_block)
-        tmp_block = []
-    else:
-        tmp_block.append(line[:-1])
-
-funcs = []
-# get functions
-for i in range(len(blocks)):
-    if any(["Function id" in line for line in blocks[i]]):
-        func = Function(int(re.findall(r"\d+", blocks[i][1])[0]))
-        func.locals = LocalsReader(blocks[i+3]).read()
-        func.constants = ConstantsReader(blocks[i+5]).read()
-        func.blocks = AsmReader(blocks[i+8]).read(func.locals, func.constants)
-        funcs.append(func)
+    funcs = []
+    # get functions
+    for i in range(len(blocks)):
+        if any(["Function id" in line for line in blocks[i]]):
+            func = Function(int(re.findall(r"\d+", blocks[i][1])[0]))
+            func.locals = LocalsReader(blocks[i+3]).read()
+            func.constants = ConstantsReader(blocks[i+5]).read()
+            func.blocks = AsmReader(blocks[i+8]).read(func.locals, func.constants)
+            funcs.append(func)
+    
+    return funcs
