@@ -1,5 +1,5 @@
 from PyMermaid.mermaid import flowchart as f
-from load_ir import *
+from ir_loader import *
 from sys import argv
 
 f.set_layout(f.layout_topToBottom)
