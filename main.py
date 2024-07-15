@@ -22,5 +22,5 @@ def render(func, output):
     open(output, "w").write(f.evaluate())
 
 if __name__ == "__main__":
-    render(func1, "func1.md")
-    # render(func2, "func2.md")
+    for i in range(len(funcs)):
+        render(funcs[i], f"func{i}.html")

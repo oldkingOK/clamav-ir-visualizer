@@ -1,3 +1,4 @@
+import re
 from enum import Enum, auto
 
 # 类型处理
@@ -52,10 +53,10 @@ class Function:
         self.blocks = []
 
     def __str__(self):
-        return f"Function {self.id}:\nGlobals: {self.globals}\nLocals: {self.locals}\nConstants: {self.constants}\nASM: {self.blocks}"
+        return f"Function {self.id}:\nGlobals: IGNORE\nLocals: {len(self.locals)}\nConstants: {len(self.constants)}"
 
 SEPERATOR = "------------------------------------------------------------------------"
-lines = open("ir.log").readlines()
+lines = open("./sample/sample_ir.log").readlines()
 
 # File readers 
 
@@ -153,14 +154,12 @@ for line in lines:
     else:
         tmp_block.append(line[:-1])
 
+funcs = []
 # get functions
-func1 = Function(0)
-func1.locals = LocalsReader(blocks[5]).read()
-func1.constants = ConstantsReader(blocks[7]).read()
-func1.blocks = AsmReader(blocks[10]).read(func1.locals, func1.constants)
-
-
-func2 = Function(1)
-func2.locals = LocalsReader(blocks[14]).read()
-func2.constants = ConstantsReader(blocks[16]).read()
-func2.blocks = AsmReader(blocks[19]).read(func2.locals, func2.constants)
+for i in range(len(blocks)):
+    if any(["Function id" in line for line in blocks[i]]):
+        func = Function(int(re.findall(r"\d+", blocks[i][1])[0]))
+        func.locals = LocalsReader(blocks[i+3]).read()
+        func.constants = ConstantsReader(blocks[i+5]).read()
+        func.blocks = AsmReader(blocks[i+8]).read(func.locals, func.constants)
+        funcs.append(func)
