@@ -2,6 +2,7 @@ from PyMermaid.mermaid import flowchart as f
 from load_ir import *
 
 f.set_layout(f.layout_topToBottom)
+template = open("template.html").read()
 def render(func, output):
     nodes = {}
     for id, block in func.blocks.items():
@@ -19,7 +20,12 @@ def render(func, output):
             case NextType.RET:
                 pass    
 
-    open(output, "w").write(f.evaluate())
+    open(output, "w").write(template
+                            .replace("{{ title }}", output)
+                            .replace("{{ content }}", 
+                                    f.evaluate(clear=True)
+                                        .replace("```mermaid\n", "")
+                                        .replace("\n```", "")))
 
 if __name__ == "__main__":
     for i in range(len(funcs)):
